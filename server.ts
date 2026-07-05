@@ -16,7 +16,7 @@ async function startServer() {
   let ai: GoogleGenAI | null = null;
   const apiKey = process.env.GEMINI_API_KEY;
 
-  if (apiKey) {
+  if (apiKey && apiKey !== "undefined" && apiKey !== "null" && apiKey.trim() !== "") {
     ai = new GoogleGenAI({
       apiKey: apiKey,
       httpOptions: {
@@ -48,9 +48,9 @@ async function startServer() {
         return;
       }
 
-      // If AI client is not available, use a high-quality local fallback template
-      if (!ai) {
-        const localDraft = `Respected Dr. Ritesh Agrahari (PT),
+      // Reusable clinical template generator
+      const generateLocalDraft = () => {
+        return `Respected Dr. Ritesh Agrahari (PT),
 
 I would like to request an appointment/home visit at your clinic. Here are my details:
 
@@ -65,16 +65,20 @@ I would like to request an appointment/home visit at your clinic. Here are my de
 
 Please let me know your availability.
 
-Thank you,
+Sincerely,
 ${name}`;
+      };
 
-        res.json({ draft: localDraft, mode: "fallback" });
+      // If AI client is not available, use a high-quality local fallback template
+      if (!ai) {
+        res.json({ draft: generateLocalDraft(), mode: "fallback" });
         return;
       }
 
-      const systemPrompt = `You are an expert clinical receptionist and administrative assistant for a high-end physical therapy and ortho-neuro rehabilitation clinic. Your job is to format raw user symptoms and appointment details into a highly professional, polite, and beautifully structured WhatsApp message directed to Dr. Ritesh Agrahari (PT).`;
+      try {
+        const systemPrompt = `You are an expert clinical receptionist and administrative assistant for a high-end physical therapy and ortho-neuro rehabilitation clinic. Your job is to format raw user symptoms and appointment details into a highly professional, polite, and beautifully structured WhatsApp message directed to Dr. Ritesh Agrahari (PT).`;
 
-      const userPrompt = `Draft a professional WhatsApp message for Dr. Ritesh Agrahari (PT), BPT, MSMF Saifai PGI, Consultant Physiotherapist. Use professional formatting with clean emojis (like 📅, 👤, 🩺, 📍, 🏠, 🏥) to structure the information, making it extremely readable and respectful.
+        const userPrompt = `Draft a professional WhatsApp message for Dr. Ritesh Agrahari (PT), BPT, MSMF Saifai PGI, Consultant Physiotherapist. Use professional formatting with clean emojis (like 📅, 👤, 🩺, 📍, 🏠, 🏥) to structure the information, making it extremely readable and respectful.
 
 Patient details to compile:
 - Patient Name: ${name}
@@ -94,26 +98,38 @@ Guidelines:
 5. End with a polite closing, followed by "Sincerely, [Patient Name]".
 6. Do NOT write any meta-conversational text, introductions, or codeblocks. Output ONLY the raw text to be sent via WhatsApp.`;
 
-      // Call Gemini 3.5 Flash server-side
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: userPrompt,
-        config: {
-          systemInstruction: systemPrompt,
-          temperature: 0.7,
-        },
-      });
+        // Call Gemini 3.5 Flash server-side
+        const response = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: userPrompt,
+          config: {
+            systemInstruction: systemPrompt,
+            temperature: 0.7,
+          },
+        });
 
-      const draftText = response.text || "";
+        const draftText = response.text || "";
 
-      res.json({
-        draft: draftText.trim(),
-        mode: "ai",
-      });
+        if (!draftText.trim()) {
+          throw new Error("Received empty response from Gemini API.");
+        }
+
+        res.json({
+          draft: draftText.trim(),
+          mode: "ai",
+        });
+      } catch (geminiError: any) {
+        console.error("Gemini service failed, falling back to template:", geminiError);
+        res.json({
+          draft: generateLocalDraft(),
+          mode: "fallback",
+          warning: "AI generation is currently unavailable. Using standard clinical template.",
+        });
+      }
     } catch (error: any) {
-      console.error("Gemini drafting error:", error);
+      console.error("General drafting error:", error);
       res.status(500).json({
-        error: "Failed to generate draft due to an internal server error.",
+        error: "Failed to process drafting request.",
         details: error.message || error,
       });
     }

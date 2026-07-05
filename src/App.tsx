@@ -151,7 +151,14 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate clinical draft.");
+        let serverErrorMsg = "Failed to generate clinical draft.";
+        try {
+          const errorData = await response.json();
+          if (errorData && errorData.error) {
+            serverErrorMsg = errorData.error;
+          }
+        } catch (_) {}
+        throw new Error(serverErrorMsg);
       }
 
       const data = await response.json();
@@ -159,7 +166,7 @@ export default function App() {
       setDraftMode(data.mode);
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(lang === "en" ? "Something went wrong while communicating with our server. Please try again." : "सर्वर से संपर्क करने में समस्या हुई। कृपया पुनः प्रयास करें।");
+      setErrorMsg(err.message || (lang === "en" ? "Something went wrong while communicating with our server. Please try again." : "सर्वर से संपर्क करने में समस्या हुई। कृपया पुनः प्रयास करें।"));
     } finally {
       setIsDrafting(false);
     }
