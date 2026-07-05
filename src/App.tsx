@@ -225,11 +225,11 @@ ${formName}`;
           {/* Logo & Branding */}
           <div className="flex items-center gap-3">
             {/* Image logo provided by the user */}
-            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md border border-neutral-100 bg-white">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-white transition-transform hover:scale-105 duration-200">
               <img 
-                src="https://res.cloudinary.com/dvmrrn6gg/image/upload/v1783277356/Untitled_-_July_05_2026_at_23.05.28_coydep.png" 
+                src="https://res.cloudinary.com/dvmrrn6gg/image/upload/v1783281948/ChatGPT_Image_Jul_6__2026__01_24_47_AM_upscaled_e9hzjs.png" 
                 alt="Nirmala Physiotherapy Logo" 
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
             </div>
