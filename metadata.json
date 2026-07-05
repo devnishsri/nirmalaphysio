@@ -1,0 +1,6 @@
+{
+  "name": "Nirmala Physiotherapy Clinic",
+  "description": "A sleek, modern and clean website for Nirmala Physiotherapy & Ortho-Neuro Rehabilitation Clinic with Dr. Ritesh Agrahari (PT), featuring home visit booking, list of specialist treatments, and an AI-powered WhatsApp inquiry drafter.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
