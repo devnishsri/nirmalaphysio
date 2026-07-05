@@ -169,17 +169,17 @@ ${formDescription || "कोई नहीं"}
 सादर,
 ${formName}`;
 
-      setDraftResult(formattedMessage);
-      setDraftMode("fallback");
-
       const formattedPhone = "91" + CLINIC_DATA.whatsappNumber; // Country code 91 for India
       const url = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(formattedMessage)}`;
       
-      // Instantly open WhatsApp (same tab if popup blocked or redirect directly)
-      const opened = window.open(url, "_blank");
-      if (!opened) {
-        window.location.href = url;
-      }
+      // Extremely robust in-memory <a> element click behavior to bypass iframe/popup blocks seamlessly
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err: any) {
       console.error(err);
       setErrorMsg(lang === "en" ? "Something went wrong. Please try again." : "कोई समस्या हुई। कृपया पुनः प्रयास करें।");
@@ -193,7 +193,14 @@ ${formName}`;
     if (!draftResult) return;
     const formattedPhone = "91" + CLINIC_DATA.whatsappNumber; // Country code 91 for India
     const url = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(draftResult)}`;
-    window.open(url, "_blank");
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Copy draft to clipboard
@@ -891,57 +898,6 @@ ${formName}`;
                     <span>{lang === "en" ? "Send Inquiry via WhatsApp" : "व्हाट्सएप पर तुरंत भेजें"}</span>
                   </button>
                 </form>
-
-                {/* Draft Result Visual Balloon Area */}
-                {draftResult && (
-                  <div className="mt-8 space-y-4 animate-fade-in">
-                    
-                    {/* Header bar of preview */}
-                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest flex items-center gap-1.5">
-                        <Check className="w-4 h-4 text-teal-600" />
-                        <span>{lang === "en" ? "Inquiry Draft Message" : "परामर्श ड्राफ्ट संदेश"}</span>
-                      </span>
-
-                      <div className="flex items-center gap-2">
-                        {/* Copy draft btn */}
-                        <button
-                          onClick={handleCopyDraft}
-                          className="p-1.5 rounded hover:bg-neutral-100 text-neutral-500 transition cursor-pointer"
-                          title="Copy message text"
-                        >
-                          {isCopied ? (
-                            <span className="text-[9px] font-bold text-teal-600 px-1 uppercase tracking-wider">Copied!</span>
-                          ) : (
-                            <Copy className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* WhatsApp styled preview balloon */}
-                    <div className="bg-[#fafafa] border border-neutral-100 rounded-lg p-5 relative">
-                      <div className="whitespace-pre-wrap text-neutral-800 text-xs leading-relaxed font-sans max-h-72 overflow-y-auto">
-                        {draftResult}
-                      </div>
-                    </div>
-
-                    {/* Deep link Action button */}
-                    <button
-                      onClick={handleOpenWhatsApp}
-                      className="w-full inline-flex items-center justify-center gap-2.5 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-bold uppercase tracking-[0.2em] transition cursor-pointer shadow-md shadow-teal-50"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>{lang === "en" ? "Send via WhatsApp to Dr. Ritesh" : "डॉ. रितेश को व्हाट्सएप संदेश भेजें"}</span>
-                    </button>
-
-                    <p className="text-[10px] text-center text-neutral-400 tracking-wide">
-                      {lang === "en" 
-                        ? "Opens WhatsApp Web or mobile app securely with your draft pre-filled." 
-                        : "ऊपर क्लिक करने से आपका व्हाट्सएप खुल जाएगा और यह संदेश अपने आप टाइप हो जाएगा।"}
-                    </p>
-                  </div>
-                )}
 
               </div>
             </div>
