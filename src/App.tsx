@@ -224,15 +224,14 @@ ${formName}`;
           
           {/* Logo & Branding */}
           <div className="flex items-center gap-3">
-            {/* Custom SVG logo resembling the card's orthopedic/home care logo */}
-            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center">
-              <svg viewBox="0 0 100 100" className="w-9 h-9">
-                <path d="M 10,70 L 40,30 L 70,70" fill="none" stroke="#1b4e9b" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 40,30 L 60,10 L 90,50" fill="none" stroke="#1b4e9b" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="60" cy="10" r="7" fill="#dc2626" />
-                <rect x="36" y="45" width="8" height="8" rx="1.5" fill="#171717" />
-                <rect x="66" y="55" width="8" height="8" rx="1.5" fill="#171717" />
-              </svg>
+            {/* Image logo provided by the user */}
+            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md border border-neutral-100 bg-white">
+              <img 
+                src="https://res.cloudinary.com/dvmrrn6gg/image/upload/v1783277356/Untitled_-_July_05_2026_at_23.05.28_coydep.png" 
+                alt="Nirmala Physiotherapy Logo" 
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div className="flex flex-col">
               <h1 className="text-[12px] sm:text-base md:text-lg font-extrabold tracking-tight text-[#1b4e9b] font-display leading-tight">
