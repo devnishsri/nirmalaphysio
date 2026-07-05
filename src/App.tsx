@@ -122,8 +122,8 @@ export default function App() {
     }
   };
 
-  // Submit drafting request to server
-  const handleGenerateDraft = async (e: React.FormEvent) => {
+  // Submit drafting request and instantly open WhatsApp (dineconnect style)
+  const handleGenerateDraft = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formPainArea.trim()) {
       setErrorMsg(lang === "en" ? "Please fill in Patient Name and Pain Area." : "कृपया मरीज का नाम और मुख्य तकलीफ दर्ज करें।");
@@ -132,41 +132,57 @@ export default function App() {
 
     setErrorMsg("");
     setIsDrafting(true);
-    setDraftResult("");
 
     try {
-      const response = await fetch("/api/draft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formName,
-          age: formAge,
-          phone: formPhone,
-          painArea: formPainArea,
-          duration: formDuration,
-          description: formDescription,
-          consultationType: formConsultType,
-          preferredTime: formPreferredTime,
-        }),
-      });
+      // Format professional clinical message client-side
+      const formattedMessage = lang === "en" ? `Respected Dr. Ritesh Agrahari (PT),
 
-      if (!response.ok) {
-        let serverErrorMsg = "Failed to generate clinical draft.";
-        try {
-          const errorData = await response.json();
-          if (errorData && errorData.error) {
-            serverErrorMsg = errorData.error;
-          }
-        } catch (_) {}
-        throw new Error(serverErrorMsg);
+I would like to request an appointment/home visit at your clinic. Here are my details:
+
+👤 Patient Name: ${formName}
+🎂 Age: ${formAge || "N/A"} years
+📞 Contact Phone: ${formPhone || "N/A"}
+🩺 Primary Pain/Condition: ${formPainArea}
+⏳ Duration of symptoms: ${formDuration || "N/A"}
+📍 Consultation preference: ${formConsultType === "home" ? "Home Visit" : "Clinic Appointment"}
+📅 Preferred Consultation Time: ${formPreferredTime || "N/A"}
+
+📝 Additional details/comments:
+${formDescription || "None"}
+
+Sincerely,
+${formName}` : `आदरणीय डॉ. रितेश अग्रहरी (PT),
+
+मैं आपके क्लिनिक में अपॉइंटमेंट/होम विजिट के लिए अनुरोध करना चाहता हूँ। मेरे विवरण इस प्रकार हैं:
+
+👤 मरीज का नाम: ${formName}
+🎂 आयु: ${formAge || "N/A"} वर्ष
+📞 संपर्क सूत्र: ${formPhone || "N/A"}
+🩺 मुख्य दर्द / बीमारी: ${formPainArea}
+⏳ तकलीफ की अवधि: ${formDuration || "N/A"}
+📍 परामर्श का माध्यम: ${formConsultType === "home" ? "घर पर इलाज (Home Visit)" : "क्लिनिक अपॉइंटमेंट"}
+📅 पसंदीदा समय: ${formPreferredTime || "N/A"}
+
+📝 बीमारी का संक्षिप्त विवरण / टिप्पणी:
+${formDescription || "कोई नहीं"}
+
+सादर,
+${formName}`;
+
+      setDraftResult(formattedMessage);
+      setDraftMode("fallback");
+
+      const formattedPhone = "91" + CLINIC_DATA.whatsappNumber; // Country code 91 for India
+      const url = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(formattedMessage)}`;
+      
+      // Instantly open WhatsApp (same tab if popup blocked or redirect directly)
+      const opened = window.open(url, "_blank");
+      if (!opened) {
+        window.location.href = url;
       }
-
-      const data = await response.json();
-      setDraftResult(data.draft);
-      setDraftMode(data.mode);
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(err.message || (lang === "en" ? "Something went wrong while communicating with our server. Please try again." : "सर्वर से संपर्क करने में समस्या हुई। कृपया पुनः प्रयास करें।"));
+      setErrorMsg(lang === "en" ? "Something went wrong. Please try again." : "कोई समस्या हुई। कृपया पुनः प्रयास करें।");
     } finally {
       setIsDrafting(false);
     }
@@ -866,23 +882,13 @@ export default function App() {
                     ></textarea>
                   </div>
 
-                  {/* Generate Button */}
+                  {/* Direct Send Button */}
                   <button
                     type="submit"
-                    disabled={isDrafting}
-                    className="w-full inline-flex items-center justify-center gap-2 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-bold uppercase tracking-[0.2em] transition cursor-pointer disabled:bg-neutral-200 disabled:text-neutral-400 shadow-md shadow-teal-50"
+                    className="w-full inline-flex items-center justify-center gap-2 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-bold uppercase tracking-[0.2em] transition cursor-pointer shadow-md shadow-teal-50"
                   >
-                    {isDrafting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>{lang === "en" ? "Generating clinical message..." : "जेमिनी एआई संदेश बना रहा है..."}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        <span>{lang === "en" ? "Generate Professional WhatsApp Draft" : "व्हाट्सएप परामर्श ड्राफ्ट बनाएं"}</span>
-                      </>
-                    )}
+                    <Send className="w-4 h-4" />
+                    <span>{lang === "en" ? "Send Inquiry via WhatsApp" : "व्हाट्सएप पर तुरंत भेजें"}</span>
                   </button>
                 </form>
 
@@ -891,10 +897,10 @@ export default function App() {
                   <div className="mt-8 space-y-4 animate-fade-in">
                     
                     {/* Header bar of preview */}
-                    <div className="flex items-center justify-between">
+                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest flex items-center gap-1.5">
                         <Check className="w-4 h-4 text-teal-600" />
-                        <span>{draftMode === "ai" ? "Gemini Draft Complete" : "Standard Draft"}</span>
+                        <span>{lang === "en" ? "Inquiry Draft Message" : "परामर्श ड्राफ्ट संदेश"}</span>
                       </span>
 
                       <div className="flex items-center gap-2">
