@@ -87,6 +87,7 @@ export default function App() {
   const [hoveredNav, setHoveredNav] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState<string>("about");
   const [showHeader, setShowHeader] = useState(true);
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const lastScrollY = React.useRef(0);
 
   const scrollToSection = (id: string) => {
@@ -103,13 +104,25 @@ export default function App() {
   };
 
   React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  React.useEffect(() => {
     const sections = ["about", "treatments", "booking-drafter", "faqs", "contact"];
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Hide header when scrolling down, show when scrolling up
-      if (currentScrollY > lastScrollY.current && currentScrollY > 120) {
-        setShowHeader(false);
+      // Hide header when scrolling down on mobile only
+      if (window.innerWidth < 768) {
+        if (currentScrollY > lastScrollY.current && currentScrollY > 120) {
+          setShowHeader(false);
+        } else {
+          setShowHeader(true);
+        }
       } else {
         setShowHeader(true);
       }
@@ -258,11 +271,11 @@ ${formName}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-32 md:pb-0">
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-32">
       {/* Main Elegant Header */}
       <motion.header 
         initial={{ y: 0 }}
-        animate={{ y: showHeader ? 0 : -80 }}
+        animate={{ y: (isMobile && !showHeader) ? -80 : 0 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100"
       >
@@ -302,7 +315,7 @@ ${formName}`;
           </div>
 
           {/* Quick Action Navigation & Language Switcher */}
-          <div className="flex items-center gap-4 text-[11px] font-medium uppercase tracking-widest">
+          <div className="flex items-center gap-2 sm:gap-4 text-[11px] font-medium uppercase tracking-widest">
             {/* Bilingual Toggle Button */}
             <button
               onClick={() => setLang(lang === "en" ? "hi" : "en")}
@@ -328,60 +341,16 @@ ${formName}`;
             </a>
           </div>
         </div>
-
-        {/* PC Navbar (Below the main division, visible only on PC/desktop) */}
-        <motion.div 
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="hidden md:block border-t border-neutral-100/60 bg-white/40"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
-            <nav className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-              {[
-                { id: 0, href: "#about", en: "About Doctor", hi: "चिकित्सक के बारे में" },
-                { id: 1, href: "#treatments", en: "Specialties", hi: "विशेष उपचार" },
-                { id: 2, href: "#booking-drafter", en: "Inquiry Drafter", hi: "सत्र ड्राफ्टर" },
-                { id: 3, href: "#faqs", en: "Patient FAQs", hi: "अक्सर पूछे जाने वाले प्रश्न" },
-                { id: 4, href: "#contact", en: "Contact & Timing", hi: "संपर्क सूत्र" }
-              ].map((item) => (
-                <motion.a
-                  key={item.id}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection(item.href.substring(1));
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  onMouseEnter={() => setHoveredNav(item.id)}
-                  onMouseLeave={() => setHoveredNav(null)}
-                  className="relative px-3 py-1.5 transition-colors duration-200 text-neutral-500 hover:text-teal-700 rounded-sm"
-                >
-                  <span className="relative z-10">{lang === "en" ? item.en : item.hi}</span>
-                  {hoveredNav === item.id && (
-                    <motion.span
-                      layoutId="navHoverPill"
-                      className="absolute inset-0 bg-teal-50/50 rounded-sm z-0"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                    />
-                  )}
-                </motion.a>
-              ))}
-            </nav>
-
-            <div className="text-[10px] font-mono font-medium text-neutral-400 flex items-center gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>{lang === "en" ? "HOME CARE VISIT SPECIALIST" : "घर पर इलाज उपलब्ध"}</span>
-            </div>
-          </div>
-        </motion.div>
       </motion.header>
 
       {/* Premium Minimal Hero Section */}
       <section id="about" className="relative overflow-hidden bg-white border-b border-neutral-100 py-16 md:py-24">
+        {/* Home Care Visit Specialist Badge positioned on the top right of the white section */}
+        <div className="absolute top-6 right-6 md:right-10 flex items-center gap-2 text-[10px] font-mono font-semibold text-neutral-400 tracking-wider z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-neutral-100/60 shadow-sm">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>{lang === "en" ? "HOME CARE VISIT SPECIALIST" : "घर पर इलाज उपलब्ध"}</span>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -1093,9 +1062,9 @@ ${formName}`;
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation Bar */}
+      {/* Bottom Navigation Bar */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] px-4 pt-3.5 pb-safe"
+        className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] px-4 pt-3.5 pb-safe"
         style={{ paddingBottom: "max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px))" }}
       >
         <div className="max-w-md mx-auto flex items-center justify-around">
