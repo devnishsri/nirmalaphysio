@@ -258,12 +258,13 @@ ${formName}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-24 md:pb-0">
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-32 md:pb-0">
       {/* Main Elegant Header */}
-      <header 
-        className={`sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100 transition-transform duration-300 ease-in-out ${
-          showHeader ? "translate-y-0" : "-translate-y-full"
-        }`}
+      <motion.header 
+        initial={{ y: 0 }}
+        animate={{ y: showHeader ? 0 : -80 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
@@ -377,7 +378,7 @@ ${formName}`;
             </div>
           </div>
         </motion.div>
-      </header>
+      </motion.header>
 
       {/* Premium Minimal Hero Section */}
       <section id="about" className="relative overflow-hidden bg-white border-b border-neutral-100 py-16 md:py-24">
@@ -1094,8 +1095,8 @@ ${formName}`;
 
       {/* Mobile Bottom Navigation Bar */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] px-4 pt-3 pb-safe"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)" }}
+        className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] px-4 pt-3.5 pb-safe"
+        style={{ paddingBottom: "max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px))" }}
       >
         <div className="max-w-md mx-auto flex items-center justify-around">
           {[
