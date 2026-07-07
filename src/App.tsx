@@ -258,13 +258,12 @@ ${formName}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-24 md:pb-0">
       {/* Main Elegant Header */}
-      <motion.header 
-        initial={{ y: 0 }}
-        animate={{ y: showHeader ? 0 : "-100%" }}
-        transition={{ type: "spring", stiffness: 260, damping: 26 }}
-        className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100"
+      <header 
+        className={`sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100 transition-transform duration-300 ease-in-out ${
+          showHeader ? "translate-y-0" : "-translate-y-full"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
@@ -378,7 +377,7 @@ ${formName}`;
             </div>
           </div>
         </motion.div>
-      </motion.header>
+      </header>
 
       {/* Premium Minimal Hero Section */}
       <section id="about" className="relative overflow-hidden bg-white border-b border-neutral-100 py-16 md:py-24">
@@ -1094,7 +1093,10 @@ ${formName}`;
       </footer>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] px-4 py-2">
+      <div 
+        className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] px-4 pt-3 pb-safe"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)" }}
+      >
         <div className="max-w-md mx-auto flex items-center justify-around">
           {[
             { id: "about", icon: Home, labelEn: "About", labelHi: "परिचय" },
