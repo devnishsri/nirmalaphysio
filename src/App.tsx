@@ -227,7 +227,7 @@ ${formName}`;
             {/* Image logo provided by the user */}
             <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-white transition-transform hover:scale-105 duration-200">
               <img 
-                src="https://res.cloudinary.com/dvmrrn6gg/image/upload/v1783281948/ChatGPT_Image_Jul_6__2026__01_24_47_AM_upscaled_e9hzjs.png" 
+                src="https://res.cloudinary.com/dvmrrn6gg/image/upload/v1783419561/cropped_circle_image_vsmfi4.png" 
                 alt="Nirmala Physiotherapy Logo" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
