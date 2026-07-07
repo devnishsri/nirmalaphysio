@@ -85,6 +85,41 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isCopied, setIsCopied] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<number | null>(null);
+  const [activeSection, setActiveSection] = useState<string>("about");
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const headerOffset = 100; // cleared sticky header offset beautifully
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    const sections = ["about", "treatments", "booking-drafter", "faqs", "contact"];
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 250; // offset for better accuracy
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // initial call
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Body areas for quick symptom selection
   const bodyPainShortcuts = useMemo(() => [
@@ -211,7 +246,7 @@ ${formName}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900">
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-20 md:pb-0">
       {/* Upper Announcement Banner */}
       <div className="bg-neutral-900 text-teal-100 px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-[0.2em] uppercase border-b border-neutral-800 flex items-center justify-center gap-2">
         <span className="inline-flex h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse"></span>
@@ -271,6 +306,10 @@ ${formName}`;
             {/* Quick Consultation CTAs */}
             <a
               href="#booking-drafter"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("booking-drafter");
+              }}
               className="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-neutral-200 rounded text-neutral-900 hover:border-black bg-white transition-colors"
             >
               <Calendar className="w-3.5 h-3.5 text-teal-600" />
@@ -298,6 +337,10 @@ ${formName}`;
                 <motion.a
                   key={item.id}
                   href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(item.href.substring(1));
+                  }}
                   whileTap={{ scale: 0.95 }}
                   onMouseEnter={() => setHoveredNav(item.id)}
                   onMouseLeave={() => setHoveredNav(null)}
@@ -391,6 +434,10 @@ ${formName}`;
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4">
                 <a
                   href="#booking-drafter"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection("booking-drafter");
+                  }}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded text-xs uppercase tracking-[0.2em] shadow-lg shadow-teal-100 transition duration-150"
                 >
                   <span>{lang === "en" ? "Draft Your Session" : "पूछताछ संदेश बनाएं"}</span>
@@ -1024,6 +1071,48 @@ ${formName}`;
           </p>
         </div>
       </footer>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] px-4 py-2">
+        <div className="max-w-md mx-auto flex items-center justify-around">
+          {[
+            { id: "about", icon: Home, labelEn: "About", labelHi: "परिचय" },
+            { id: "treatments", icon: Activity, labelEn: "Treatments", labelHi: "इलाज" },
+            { id: "booking-drafter", icon: MessageSquare, labelEn: "Drafter", labelHi: "ड्राफ्टर" },
+            { id: "faqs", icon: HelpCircle, labelEn: "FAQs", labelHi: "सवाल" },
+            { id: "contact", icon: Phone, labelEn: "Contact", labelHi: "संपर्क" },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.id;
+            return (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(item.id);
+                  setActiveSection(item.id);
+                }}
+                className="flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all duration-200 relative"
+              >
+                <div className={`p-1 rounded-lg transition-all duration-300 relative z-10 ${isActive ? "text-teal-600" : "text-neutral-400"}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <span className={`text-[9px] font-bold mt-1 tracking-tight relative z-10 transition-colors duration-300 ${isActive ? "text-teal-600" : "text-neutral-400"}`}>
+                  {lang === "en" ? item.labelEn : item.labelHi}
+                </span>
+                {isActive && (
+                  <motion.div
+                    layoutId="mobileNavActiveBg"
+                    className="absolute inset-0 bg-teal-50/70 rounded-xl -z-0"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
