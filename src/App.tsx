@@ -86,6 +86,8 @@ export default function App() {
   const [isCopied, setIsCopied] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState<string>("about");
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = React.useRef(0);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -103,7 +105,17 @@ export default function App() {
   React.useEffect(() => {
     const sections = ["about", "treatments", "booking-drafter", "faqs", "contact"];
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 250; // offset for better accuracy
+      const currentScrollY = window.scrollY;
+
+      // Hide header when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY.current && currentScrollY > 120) {
+        setShowHeader(false);
+      } else {
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+
+      const scrollPosition = currentScrollY + 250; // offset for better accuracy
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
@@ -116,7 +128,7 @@ export default function App() {
         }
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // initial call
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -247,14 +259,13 @@ ${formName}`;
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-teal-100 selection:text-teal-900 pb-20 md:pb-0">
-      {/* Upper Announcement Banner */}
-      <div className="bg-neutral-900 text-teal-100 px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-[0.2em] uppercase border-b border-neutral-800 flex items-center justify-center gap-2">
-        <span className="inline-flex h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse"></span>
-        <span>{lang === "en" ? CLINIC_DATA.sloganEn : CLINIC_DATA.sloganHi}</span>
-      </div>
-
       {/* Main Elegant Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100">
+      <motion.header 
+        initial={{ y: 0 }}
+        animate={{ y: showHeader ? 0 : "-100%" }}
+        transition={{ type: "spring", stiffness: 260, damping: 26 }}
+        className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
           {/* Logo & Branding */}
@@ -367,7 +378,7 @@ ${formName}`;
             </div>
           </div>
         </motion.div>
-      </header>
+      </motion.header>
 
       {/* Premium Minimal Hero Section */}
       <section id="about" className="relative overflow-hidden bg-white border-b border-neutral-100 py-16 md:py-24">
@@ -375,7 +386,12 @@ ${formName}`;
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Hero Text */}
-            <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-7 space-y-8 text-center lg:text-left"
+            >
               
               {/* Specialized Badge */}
               <div className="inline-block">
@@ -454,10 +470,15 @@ ${formName}`;
                   <span>+91 7905431134</span>
                 </a>
               </div>
-            </div>
+            </motion.div>
 
             {/* Doctor Card Profile */}
-            <div className="lg:col-span-5">
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+              className="lg:col-span-5"
+            >
               <div className="bg-white rounded-2xl border border-neutral-100 p-8 relative overflow-hidden shadow-sm">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-bl-full opacity-40"></div>
                 
@@ -517,7 +538,7 @@ ${formName}`;
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
