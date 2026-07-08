@@ -1064,8 +1064,7 @@ ${formName}`;
 
       {/* Bottom Navigation Bar */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-neutral-100/80 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] px-4 pt-3.5 pb-safe"
-        style={{ paddingBottom: "max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px))" }}
+        className="fixed bottom-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto sm:w-full sm:max-w-md z-50 bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(15,118,110,0.08)] px-4 py-2.5 rounded-3xl transition-all duration-300 ring-1 ring-white/20"
       >
         <div className="max-w-md mx-auto flex items-center justify-around">
           {[
@@ -1088,16 +1087,16 @@ ${formName}`;
                 }}
                 className="flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all duration-200 relative"
               >
-                <div className={`p-1 rounded-lg transition-all duration-300 relative z-10 ${isActive ? "text-teal-600" : "text-neutral-400"}`}>
+                <div className={`p-1 rounded-lg transition-all duration-300 relative z-10 ${isActive ? "text-teal-800" : "text-neutral-500"}`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`text-[9px] font-bold mt-1 tracking-tight relative z-10 transition-colors duration-300 ${isActive ? "text-teal-600" : "text-neutral-400"}`}>
+                <span className={`text-[9px] font-bold mt-1 tracking-tight relative z-10 transition-colors duration-300 ${isActive ? "text-teal-900" : "text-neutral-500"}`}>
                   {lang === "en" ? item.labelEn : item.labelHi}
                 </span>
                 {isActive && (
                   <motion.div
                     layoutId="mobileNavActiveBg"
-                    className="absolute inset-0 bg-teal-50/70 rounded-xl -z-0"
+                    className="absolute inset-0 bg-white/40 backdrop-blur-md rounded-xl border border-white/30 shadow-[0_2px_8px_rgba(255,255,255,0.4)] -z-0"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
